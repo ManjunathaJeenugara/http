@@ -17,7 +17,6 @@ To perform security testing different tools are available in order to be able to
 
 - [Checkmarx](https://www.checkmarx.com/technology/static-code-analysis-sca/) - Static Source Code Scanner that also scans source code for Android and iOS.
 - [Fortify](https://saas.hpe.com/en-us/software/fortify-on-demand/mobile-security) - Static source code scanner that also scans source code for Android and iOS.
-- [Acccenture](https://digitalsecurity.accenture.com) - Static source code scanner that also scans source code for Android and iOS.
 - [Veracode](https://www.veracode.com/products/binary-static-analysis-sast "Veracode Static Analysis") - Static Analysis of iOS and Android binary
 
 ### All-in-One Mobile Security Frameworks
@@ -132,5 +131,7 @@ To perform security testing different tools are available in order to be able to
 
 ### IDEs
 
+- [Android Studio](https://developer.android.com/studio/index.html) -  is the official integrated development environment (IDE) for Google's Android operating system, built on JetBrains' IntelliJ IDEA software and designed specifically for Android development.
 - [IntelliJ](https://www.jetbrains.com/idea/download/) - IntelliJ IDEA is a Java integrated development environment (IDE) for developing computer software.
 - [Eclipse](https://eclipse.org/) - Eclipse is an integrated development environment (IDE) used in computer programming, and is the most widely used Java IDE.
+- [Xcode](https://developer.apple.com/xcode/) - Xcode is an integrated development environment (IDE) available only for macOS to create apps for iOS, watchOS, tvOS and macOS.

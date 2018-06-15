@@ -73,7 +73,7 @@ Ideally, in such a system the user's context is compared to previously recorded 
 
 Perform the following steps when testing authentication and authorization:
 
-- Identify the additional authentication factors the app uses. 
+- Identify the additional authentication factors the app uses.
 - Locate all endpoints that provide critical functionality.
 - Verify that the additional factors are strictly enforced on all server-side endpoints.
 
@@ -115,8 +115,7 @@ The password must meet at least three out of the following four complexity rules
 3. at least one digit (0-9)
 4. at least one special character
 
-
-Verify the existences of a password policy and password complexity requirements. Identify all password-related functions in the source code and make sure that a the verification check is performed in each of them. Review the password verification function and make sure that it rejects passwords that violate the password policy.
+Verify the existences of a password policy and password complexity requirements and verify also with the [OWASP Authentication Cheat Sheet](https://www.owasp.org/index.php/Authentication_Cheat_Sheet#Password_Complexity "Password Complexity"). Identify all password-related functions in the source code and make sure that a the verification check is performed in each of them. Review the password verification function and make sure that it rejects passwords that violate the password policy.
 
 Regular Expressions are often used to enforce password rules. For example, the [JavaScript implementation by NowSecure](https://github.com/nowsecure/owasp-password-strength-test "NowSecure - OWASP Password Strength Test") uses regular expressions to test the password for various characteristics, such as length and character type. The following is an excerpt of the code:
 
@@ -293,8 +292,6 @@ The second part of the token is the *payload*, which contains so-called claims. 
 {"sub":"1234567890","name":"John Doe","admin":true}
 ```
 
-Signature
-
 The signature is created by applying the algorithm specified in the JWT header to the encoded header, encoded payload, and a secret value. For example, when using the HMAC SHA256 algorithm the signature is created in the following way:
 
 ```
@@ -305,13 +302,13 @@ Note that the secret is shared between the authentication server and the back en
 
 #### Static Analysis
 
-Identify the JWT library that the server and client use. Find out whether the JWT libraries in use have any known vulnerabilities .
+Identify the JWT library that the server and client use. Find out whether the JWT libraries in use have any known vulnerabilities.
 
 Verify that the implementation adheres to JWT [best practices](https://stormpath.com/blog/jwt-the-right-way "JWT the right way"):
 
 - Verify that the HMAC is checked for all incoming requests containing a token;
 - Verify the location of the private signing key or HMAC secret key. The key should remain on the server and should never be shared with the client. It should be available for the issuer and verifier only.
-- Verify that no sensitive data, such as personal identifiable information, is embedded in the JWT. If, for some reason, the architecture requires transmission of such information in the token, make sure that payload encryption is being applied. See the sample Java implementation on the [OWASP JWT Cheat Sheet](https://www.owasp.org/index.php/JSON_Web_Token_(JWT\)\_Cheat_Sheet_for_Java).
+- Verify that no sensitive data, such as personal identifiable information, is embedded in the JWT. If, for some reason, the architecture requires transmission of such information in the token, make sure that payload encryption is being applied. See the sample Java implementation on the [OWASP JWT Cheat Sheet](https://www.owasp.org/index.php/JSON_Web_Token_\(JWT\)_Cheat_Sheet_for_Java).
 - Make sure that replay attacks are addressed with the `jti` (JWT ID) claim, which gives the JWT a unique identifier.
 - Verify that tokens are stored securely on the mobile phone, with, for example, KeyChain (iOS) or KeyStore (Android).
 
@@ -371,11 +368,11 @@ Investigate the following JWT vulnerabilities while performing dynamic analysis:
 - Token Storage on the client:
   * The token storage location should be verified for mobile apps that use JWT.
 - Cracking the signing key:
-  * Token signatures are created via a private key on the server. After you obtain a JWT, choose a tool for [brute forcing the secret key offline](https://www.sjoerdlangkemper.nl/2016/09/28/attacking-jwt-authentication/ "Attacking JWT Authentication"). See the tools section for details.
+  * Token signatures are created via a private key on the server. After you obtain a JWT, choose a tool for [brute forcing the secret key offline](https://www.sjoerdlangkemper.nl/2016/09/28/attacking-jwt-authentication/ "Attacking JWT Authentication").
 - Information Disclosure:
   * Decode the Base64-encoded JWT and find out what kind of data it transmits and whether that data is encrypted.
 
-Also, make sure to check out the OWASP JWT Cheat Sheet](https://www.owasp.org/index.php/JSON_Web_Token_(JWT\)\_Cheat_Sheet_for_Java "OWASP JWT Cheat Sheet").
+Also, make sure to check out the [OWASP JWT Cheat Sheet](https://www.owasp.org/index.php/JSON_Web_Token_(JWT)_Cheat_Sheet_for_Java "OWASP JWT Cheat Sheet").
 
 ##### Tampering with the Hashing Algorithm
 
@@ -402,7 +399,7 @@ If access and refresh tokens are used with stateless authentication, they should
 
 #### Dynamic Analysis
 
-Use an interception proxy for dynamic application analysis. Use the following steps to check whether the logout is implemented properly. 
+Use an interception proxy for dynamic application analysis. Use the following steps to check whether the logout is implemented properly.
 
 1.  Log into the application.
 2.  Perform a couple of operations that require authentication inside the application.
@@ -434,7 +431,7 @@ OAuth 2.0 defines four roles:
 
 Note: The API fulfills both the Resource Owner and Authorization Server roles. Therefore, we will refer to both as the API.
 
-<img src="Images/Chapters/0x04e/abstract_oath2_flow.png" width="450px"/>
+![Abstract Protocol Flow](Images/Chapters/0x04e/abstract_oath2_flow.png)
 
 Here is a more [detailed explanation](https://www.digitalocean.com/community/tutorials/an-introduction-to-oauth-2 "An Introduction into OAuth2") of the steps in the diagram:
 
@@ -528,7 +525,7 @@ For additional best practices and detailed information please refer to the follo
 
 - Free and Professional Burp Suite editions - https://portswigger.net/burp/
 Important precision: The free Burp Suite edition has significant limitations . In the Intruder module, for example, the tool automatically slows down after a few requests, password dictionaries aren't included, and you can't save projects.
-- OWASP ZAP - https://www.owasp.org/index.php/OWASP_Zed_Attack_Proxy_Project
+- [OWASP ZAP](https://www.owasp.org/index.php/OWASP_Zed_Attack_Proxy_Project)
 - [jwtbrute](https://github.com/jmaxxz/jwtbrute)
 - [crackjwt](https://github.com/Sjord/jwtcrack/blob/master/crackjwt.py)
 - [John the ripper](https://github.com/magnumripper/JohnTheRipper)

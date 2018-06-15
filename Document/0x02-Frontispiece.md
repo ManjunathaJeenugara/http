@@ -8,8 +8,8 @@ OWASP thanks the many authors, reviewers, and editors for their hard work in dev
 
 ## Copyright and License
 
-![license](Images/license.png)
-Copyright © 2017 The OWASP Foundation. This work is licensed under a [Creative Commons Attribution-ShareAlike 4.0 International License](https://creativecommons.org/licenses/by-sa/4.0/). For any reuse or distribution, you must make clear to others the license terms of this work.
+![license](Images/license.jpg)
+Copyright © 2018 The OWASP Foundation. This work is licensed under a [Creative Commons Attribution-ShareAlike 4.0 International License](https://creativecommons.org/licenses/by-sa/4.0/). For any reuse or distribution, you must make clear to others the license terms of this work.
 
 ## Acknowledgements
 
@@ -23,7 +23,7 @@ Bernhard is a cyber security specialist with a talent for hacking systems of all
 
 #### Sven Schleier
 
-Sven is an experienced penetration tester and security architect who specializes in implementing secure SDLC for web applications, iOS apps, and Android apps. He is a project leader for the OWASP Mobile Security Testing Guide and the creator of OWASP Mobile Hacking Playground. Sven also supports the community with free, hands-on workshops about web and mobile app security testing. He has published several security advisories and white papers about HSTS.
+Sven is an experienced web and mobile penetration tester and assessed everything from historic Flash applications to progressive apps build on the MEAN stack. He is also a security engineer that supported many projects end-to-end during the SDLC to "build security in". He was speaking at local and international meetups and conferences and is conducting hands-on workshops about web application and mobile app security. 
 
 ### Co-Authors
 
@@ -31,7 +31,7 @@ Co-authors have consistently contributed quality content and have at least 2,000
 
 #### Romuald Szkudlarek
 
-Romuald is a passionate cyber security & privacy professional with over 15 years of experience in the web, mobile, IoT and cloud domains. During his career, he has been dedicating his spare time to a variety of projects with the goal of advancing the sectors of software and security. He is teaching regularly at various institutions. He holds CISSP, CSSLP, and CEH credentials.
+Romuald is a passionate cyber security & privacy professional with over 15 years of experience in the web, mobile, IoT and cloud domains. During his career, he has been dedicating his spare time to a variety of projects with the goal of advancing the sectors of software and security. He is teaching regularly at various institutions. He holds CISSP, CCSP, CSSLP, and CEH credentials.
 
 #### Jeroen Willemsen
 
